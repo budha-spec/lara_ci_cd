@@ -27,3 +27,8 @@ variable "app_key" {
   default = "base64:4Qsmg+HjU5G91rETWAs55GRlIQwjSalYekMEuoa678c="
   sensitive = true
 }
+
+variable "create_bucket" {
+  type    = bool
+  default = true
+}
