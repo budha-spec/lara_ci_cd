@@ -1,20 +1,28 @@
 name: Deploy Laravel to Elastic Beanstalk
 
-
 on:
 
-  workflow_call:
-
+  push:
+    branches:
+      - main
 
 jobs:
 
+  terraform:
+
+    uses: ./.github/workflows/terraform.yml
+
+    secrets: inherit
+
+
   deploy:
+
+    needs: terraform
 
     runs-on: ubuntu-latest
 
 
     steps:
-
 
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -32,5 +40,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 
-      - name: Verify AWS Access
-        run: aws sts get-caller-identity
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          echo "Deploy Laravel application here"
