@@ -2,7 +2,7 @@ terraform {
 
   backend "s3" {
 
-    bucket = "laravel-app-prod-terraform-state"
+    bucket = "laravel-app-prod-storage"
 
     key = "terraform/state.tfstate"
 
