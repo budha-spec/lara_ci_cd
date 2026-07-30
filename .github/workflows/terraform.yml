@@ -1,11 +1,8 @@
-name: Terraform
+name: Terraform Infrastructure
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "terraform/**"
+  workflow_call:
+
 
 jobs:
 
@@ -16,6 +13,7 @@ jobs:
     defaults:
       run:
         working-directory: terraform
+
 
     steps:
 
@@ -29,6 +27,7 @@ jobs:
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
+
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -49,12 +48,3 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
-
-
-  deploy:
-
-    needs: terraform
-
-    uses: ./.github/workflows/deploy.yml
-
-    secrets: inherit
