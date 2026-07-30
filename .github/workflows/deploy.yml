@@ -1,12 +1,15 @@
 name: Deploy Laravel to Elastic Beanstalk
 
+
 on:
 
   push:
     branches:
       - main
 
+
 jobs:
+
 
   terraform:
 
@@ -15,7 +18,9 @@ jobs:
     secrets: inherit
 
 
+
   deploy:
+
 
     needs: terraform
 
@@ -23,6 +28,7 @@ jobs:
 
 
     steps:
+
 
       - name: Checkout Repository
         uses: actions/checkout@v4
