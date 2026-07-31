@@ -46,6 +46,29 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          echo "Deploy Laravel application here"
+      - name: Create deployment package
+  	  run: |
+  	    zip -r deploy.zip . \
+  	      -x ".git/*" \
+  	      -x ".github/*" \
+  	      -x "terraform/*" \
+  	      -x "vendor/*" \
+  	      -x "node_modules/*"
+  
+  	- name: Upload package to S3
+  	  run: |
+  	    aws s3 cp deploy.zip \
+  	      s3://laravel-app-prod-deploy/deploy-${{ github.sha }}.zip
+  
+  	- name: Create Elastic Beanstalk Application Version
+  	  run: |
+  	    aws elasticbeanstalk create-application-version \
+  	      --application-name laravel-app-prod \
+  	      --version-label ${{ github.sha }} \
+  	      --source-bundle S3Bucket="laravel-app-prod-deploy",S3Key="deploy-${{ github.sha }}.zip"
+  
+  	- name: Deploy Application Version
+	  run: |
+	    aws elasticbeanstalk update-environment \
+	      --environment-name laravel-app-prod-env \
+	      --version-label ${{ github.sha }}
