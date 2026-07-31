@@ -17,10 +17,6 @@ composer install \
     --optimize-autoloader \
     --no-interaction
 
-echo "Generating application key..."
-
-php artisan key:generate --force
-
 echo "Running migrations..."
 
 php artisan migrate --force
