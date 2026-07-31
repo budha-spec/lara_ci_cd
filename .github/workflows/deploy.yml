@@ -1,74 +1,64 @@
 name: Deploy Laravel to Elastic Beanstalk
 
-
 on:
-
   push:
     branches:
       - main
 
-
 jobs:
 
-
   terraform:
-
     uses: ./.github/workflows/terraform.yml
-
     secrets: inherit
 
-
-
   deploy:
-
-
     needs: terraform
 
     runs-on: ubuntu-latest
 
-
     steps:
-
 
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
-
         with:
-
           aws-region: ${{ secrets.AWS_REGION }}
-
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, pdo_mysql, bcmath, ctype, fileinfo, json, openssl, tokenizer, xml
+          tools: composer:v2
 
-      - name: Create deployment package
-  	  run: |
-  	    zip -r deploy.zip . \
-  	      -x ".git/*" \
-  	      -x ".github/*" \
-  	      -x "terraform/*" \
-  	      -x "vendor/*" \
-  	      -x "node_modules/*"
-  
-  	- name: Upload package to S3
-  	  run: |
-  	    aws s3 cp deploy.zip \
-  	      s3://laravel-app-prod-deploy/deploy-${{ github.sha }}.zip
-  
-  	- name: Create Elastic Beanstalk Application Version
-  	  run: |
-  	    aws elasticbeanstalk create-application-version \
-  	      --application-name laravel-app-prod \
-  	      --version-label ${{ github.sha }} \
-  	      --source-bundle S3Bucket="laravel-app-prod-deploy",S3Key="deploy-${{ github.sha }}.zip"
-  
-  	- name: Deploy Application Version
-	  run: |
-	    aws elasticbeanstalk update-environment \
-	      --environment-name laravel-app-prod-env \
-	      --version-label ${{ github.sha }}
+      - name: Install Composer Dependencies
+        run: composer install \
+          --no-dev \
+          --prefer-dist \
+          --optimize-autoloader \
+          --no-interaction
+
+      - name: Build Deployment Package
+        run: |
+          zip -r deploy.zip . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "terraform/*" \
+            -x "node_modules/*" \
+            -x "tests/*"
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: laravel-app-prod
+          environment_name: laravel-app-prod-env
+          region: ${{ secrets.AWS_REGION }}
+          version_label: ${{ github.sha }}
+          deployment_package: deploy.zip
+          wait_for_deployment: true
