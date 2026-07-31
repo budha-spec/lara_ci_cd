@@ -12,8 +12,6 @@ terraform {
 
     use_lockfile = true
 
-    depends_on = [aws_s3_bucket.storage]
-
   }
 
 }
