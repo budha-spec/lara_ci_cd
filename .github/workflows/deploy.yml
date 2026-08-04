@@ -38,6 +38,17 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Vite assets
+        run: npm run build
+
       - name: Build Deployment Package
         run: |
           zip -r deploy.zip . \
