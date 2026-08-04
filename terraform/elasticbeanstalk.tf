@@ -14,6 +14,13 @@ resource "aws_elastic_beanstalk_environment" "prod" {
     solution_stack_name = data.aws_elastic_beanstalk_solution_stack.php.name
 
     setting {
+        namespace = "aws:autoscaling:launchconfiguration"
+        name      = "SecurityGroups"
+        value     = aws_security_group.eb.id
+    }
+
+
+    setting {
         namespace ="aws:autoscaling:launchconfiguration"
         name ="IamInstanceProfile"
         value =aws_iam_instance_profile.eb.name
@@ -71,5 +78,17 @@ resource "aws_elastic_beanstalk_environment" "prod" {
         namespace = "aws:elasticbeanstalk:application:environment"
         name      = "APP_KEY"
         value     = var.app_key
+    }
+
+    setting {
+        namespace = "aws:elasticbeanstalk:application:environment"
+        name      = "DB_CONNECTION"
+        value     = "mysql"
+    }
+
+    setting {
+        namespace = "aws:elasticbeanstalk:application:environment"
+        name      = "DB_PORT"
+        value     = "3306"
     }
 }
