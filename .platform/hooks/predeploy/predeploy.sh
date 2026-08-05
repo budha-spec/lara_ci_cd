@@ -1,9 +1,18 @@
 #!/bin/bash
 set -e
 
+echo "===== PREDEPLOY STARTED ====="
+
 APP_DIR="/var/app/staging"
 
+if [ ! -d "$APP_DIR" ]; then
+    echo "Staging directory not found: $APP_DIR"
+    exit 1
+fi
+
 cd "$APP_DIR"
+
+echo "Creating Laravel directories..."
 
 mkdir -p bootstrap/cache
 
@@ -14,8 +23,9 @@ mkdir -p storage/framework/views
 mkdir -p storage/framework/testing
 mkdir -p storage/logs
 
-chown -R webapp:webapp storage
-chown -R webapp:webapp bootstrap/cache
+echo "Setting permissions..."
 
-chmod -R 775 storage
-chmod -R 775 bootstrap/cache
+chown -R webapp:webapp storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+
+echo "===== PREDEPLOY FINISHED ====="
