@@ -25,4 +25,17 @@ class HomeController extends Controller
     {
         return view('home');
     }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function account(Request $request)
+    {
+         return view('account', [
+            'user' => $request->user(),
+        ]);
+    }
+
 }
