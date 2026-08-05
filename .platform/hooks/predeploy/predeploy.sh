@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-APP_DIR="/var/app/current"
+APP_DIR="/var/app/staging"
 
 cd "$APP_DIR"
 
