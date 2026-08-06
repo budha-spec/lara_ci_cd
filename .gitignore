@@ -10,6 +10,8 @@ crash.log
 /vendor/
 /node_modules/
 .env
+/public/build
+/.phpunit.result.cache
 
 # IDE
 .vscode/
